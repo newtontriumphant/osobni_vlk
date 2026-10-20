@@ -72,6 +72,17 @@
     transition: 0.2s;
 }
 
+#login-status {
+    margin-top: 15px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #b32626;
+}
+
+#login-status.logged-in {
+    color: #267346;
+}
+
 #login-form button:hover {
     background: #345866;
 }
