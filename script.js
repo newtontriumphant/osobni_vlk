@@ -323,11 +323,37 @@ function showConnections(itineraries) {
         title.textContent =
             `Connection ${index + 1}: ` +
             `${formatTime(journey.startTime)} → ${formatTime(journey.endTime)}`;
-        card.appendChild(title);
+
+        const header = document.createElement("div");
+        header.className = "connection-header";
+
+        const tookButton = document.createElement("button");
+        tookButton.type = "button";
+        tookButton.className = "took-button";
+
+        // how crazy are ya :)
+
+        const trains = journey.legs.filter(leg => leg.mode !== "WALK").length;
+        const transfers = Math.max(0, trains - 1);
+
+        tookButton.textContent =
+            transfers > 4 ? "I took this horde of wolves! :3c" :
+            transfers > 0 ? "I took these wolves!" :
+            "I took this wolf!";
+
+        tookButton.addEventListener("click", () => {
+            console.log("Selected connection:", journey);
+        });
+
+        header.appendChild(title);
+        header.appendChild(tookButton);
+        card.appendChild(header);
 
         const info = document.createElement("p");
+        const minutes = Math.round(journey.duration / 60);
+
         info.textContent =
-            `${Math.round(journey.duration / 60)} min · ` +
+            `${Math.floor(minutes / 60)} h ${minutes % 60} min · ` +
             `${journey.transfers} transfers`;
         card.appendChild(info);
 

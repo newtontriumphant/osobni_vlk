@@ -129,6 +129,18 @@
     padding: 1em;
 }
 
+.connection-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.connection-header h3 {
+    margin: 0;
+}
+
 #login-form {
     display: flex;
     justify-content: center;
@@ -332,4 +344,27 @@ hr.dotted {
     height: 32px;
     object-fit: contain;
     flex-shrink: 0;
+}
+
+.took-button {
+    padding: 10px 16px;
+    background: #19262a;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: 0.2s;
+}
+
+.took-button:hover {
+    background: #345866;
+}
+
+@media (max-width: 600px) {
+    .connection-header {
+        flex-wrap: wrap;
+    }
 }
