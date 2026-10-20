@@ -224,3 +224,160 @@ stationFields.forEach(id => {
         }
     });
 });
+
+document.getElementById("route-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const from = document.getElementById("start");
+    const to = document.getElementById("destination");
+
+    if (!from.dataset.stopId || !to.dataset.stopId) {
+        alert("Please select stations from the suggestions, and stop being such a free thinker! >:C");
+        return;
+    }
+
+    const date = document.getElementById("travel-date").value;
+    const time = document.getElementById("travel-time").value;
+
+    const departure = new Date(`${date}T${time}`).toISOString();
+
+    const params = new URLSearchParams({
+        fromPlace: from.dataset.stopId,
+        toPlace: to.dataset.stopId,
+        time: departure,
+        numItineraries: "10"
+    });
+
+    try {
+        const response = await fetch(
+            "https://api.transitous.org/api/v6/plan?" + params
+        );
+
+        if (!response.ok) {
+            throw new Error("HTTP " + response.status);
+        }
+
+        const data = await response.json();
+
+        showConnections(data.itineraries || []);
+
+    } catch (error) {
+        console.error(error);
+        alert("Connection search failed! Make sure you're not looking more than a month in the past!");
+    }
+});
+
+function getCarrier(leg) {
+    const name = (leg.agencyName || "").toLowerCase();
+    const train = (leg.displayName || "").toLowerCase();
+
+    if (name.includes("flix")) {
+        return { color: "#169b35", logo: "flixtrain.de" };
+    }
+
+    if (name.includes("ceske") || name.includes("české")) {
+        return {
+            color: train.includes("rj") ? "#1678c8" : "#183b75",
+            logo: "cd.cz"
+        };
+    }
+
+    if (name.includes("westbahn")) {
+        return { color: "#008b8b", logo: "westbahn.at" };
+    }
+
+    if (name.includes("oebb") || name.includes("öbb")) {
+        return { color: "#8b1630", logo: "oebb.at" };
+    }
+
+    if (name.includes("sncf") || name.includes("tgv")) {
+        return { color: "#812B6D", logo: "sncf.fr" };
+    }
+
+    if (name.includes("regiojet") || name.includes("regio jet")) {
+        return { color: "#ffcc40", logo: "regiojet.com" };
+    }
+
+    if (name.includes("db ") || name.includes("deutsche bahn")) {
+        return { color: "#ec0016", logo: "bahn.de" };
+    }
+
+    return { color: "#596a75", logo: null };
+}
+
+function showConnections(itineraries) {
+    const container = document.getElementById("connections");
+    container.replaceChildren();
+
+    if (!itineraries.length) {
+        container.textContent = "No connections found.";
+        return;
+    }
+
+    itineraries.forEach((journey, index) => {
+        
+        const card = document.createElement("div");
+        card.className = "connection-card";
+
+        const title = document.createElement("h3");
+        title.textContent =
+            `Connection ${index + 1}: ` +
+            `${formatTime(journey.startTime)} → ${formatTime(journey.endTime)}`;
+        card.appendChild(title);
+
+        const info = document.createElement("p");
+        info.textContent =
+            `${Math.round(journey.duration / 60)} min · ` +
+            `${journey.transfers} transfers`;
+        card.appendChild(info);
+
+        journey.legs.filter(leg => leg.mode !== "WALK").forEach(leg => {
+            const line = document.createElement("div");
+            line.className = "connection-leg";
+
+            const carrier = getCarrier(leg);
+            line.style.borderLeftColor = carrier.color;
+
+            if (carrier.logo && leg.mode !== "WALK") {
+                const logo = document.createElement("img");
+                logo.src = "https://www.google.com/s2/favicons?sz=64&domain="
+                    + carrier.logo;
+                logo.className = "carrier-logo";
+                logo.alt = leg.agencyName || "Carrier";
+                line.appendChild(logo);
+            }
+
+            const details = document.createElement("div");
+
+            const train = document.createElement("strong");
+            train.textContent = leg.mode === "WALK"
+                ? "Walk"
+                : leg.displayName || leg.mode;
+            details.appendChild(train);
+
+            const stops = document.createElement("p");
+            stops.textContent =
+                `${leg.from?.name || "?"} → ${leg.to?.name || "?"}`;
+            details.appendChild(stops);
+
+            const times = document.createElement("small");
+            times.textContent =
+                `${formatTime(leg.startTime)} – ${formatTime(leg.endTime)}` +
+                (leg.agencyName ? ` · ${leg.agencyName}` : "");
+            details.appendChild(times);
+
+            line.appendChild(details);
+            card.appendChild(line);
+        });
+
+        container.appendChild(card);
+    });
+}
+
+function formatTime(time) {
+    return new Date(time).toLocaleTimeString("de-DE", {
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: "Europe/Berlin"
+    });
+}

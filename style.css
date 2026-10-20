@@ -167,6 +167,11 @@
     margin-top: 10px;
 }
 
+#connections {
+    margin-top: 25px;
+    text-align: left;
+}
+
 #username:focus {
     border-color: #397ca4;
     box-shadow: 0 0 0 3px rgba(57, 124, 164, 0.15);
@@ -283,4 +288,48 @@ hr.dotted {
 .station-results {
     scrollbar-color: #8daaba transparent;
     scrollbar-width: thin;
+}
+
+.connection-card {
+    background: #f5faff;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 12px rgba(25, 38, 42, 0.1);
+}
+
+.connection-card h3 {
+    margin: 0 0 6px;
+}
+
+.connection-card > p {
+    margin: 0 0 15px;
+    font-size: 14px;
+}
+
+.connection-leg {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-left: 5px solid #596a75;
+    padding: 10px;
+    margin: 8px 0;
+    background: #e8f0f7;
+    border-radius: 6px;
+}
+
+.connection-leg p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.connection-leg small {
+    color: #52616b;
+}
+
+.carrier-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    flex-shrink: 0;
 }
