@@ -6,6 +6,18 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     referrerPolicy: 'strict-origin-when-cross-origin'
 }).addTo(map);
 
+// authupd
+
+function updateAuthUI() {
+    const loggedIn = !!currentUser;
+
+    document.querySelector(".login").hidden = loggedIn;
+    document.getElementById("route-search").hidden = !loggedIn;
+
+    document.getElementById("user-status").textContent =
+        loggedIn ? "Logged in as: " + currentUser : "";
+}
+
 // login
 
 let currentUser = null;
@@ -44,6 +56,7 @@ async function login(username) {
     savedRoutes = data.routes;
 
     updateLoginStatus();
+    updateAuthUI();
 
     routeLayers.forEach(layer => map.removeLayer(layer));
 
@@ -67,6 +80,21 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
     } catch (error) {
         alert(error.message);
     }
+});
+
+document.getElementById("logout-button").addEventListener("click", () => {
+    currentUser = null;
+    savedRoutes = [];
+
+    routeLayers.forEach(layer => map.removeLayer(layer));
+    routeLayers = [];
+
+    localStorage.removeItem("username");
+    document.getElementById("username").value = "";
+
+    updateLoginStatus();
+    updateAuthUI();
+    console.log("Logged out");
 });
 
 async function saveRoute(points, color) {
