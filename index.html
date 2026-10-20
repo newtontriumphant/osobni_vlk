@@ -30,29 +30,39 @@
             <h2>find your train!</h2>
 
             <form id="route-form">
-                <input type="text" id="start" placeholder="From" required>
-                <input type="text" id="destination" placeholder="To" required>
 
-                <input type="date" id="travel-date" required>
-                <input type="time" id="travel-time" required>
+                <div class="route-row two">
+                    <input type="text" id="start" placeholder="From" required>
+                    <input type="text" id="destination" placeholder="To" required>
+                </div>
 
-                <select id="train-type">
-                    <option value="all">All trains</option>
-                    <option value="d-ticket">D-Ticket / Regionals</option>
-                    <option value="long-distance">IC / ICE / RJ</option>
-                    <option value="flix">FlixTrain</option>
-                </select>
+
+                <div class="route-row three">
+                    <input type="date" id="travel-date" required>
+                    <input type="time" id="travel-time" required>
+
+                    <select id="train-type">
+                        <option value="all">All trains</option>
+                        <option value="d-ticket">D-Ticket / Regionals</option>
+                        <option value="long-distance">IC / ICE / RJ</option>
+                        <option value="flix">FlixTrain</option>
+                    </select>
+                </div>
 
                 <h3>Via (optional)</h3>
-                <input type="text" id="via1" placeholder="Via 1">
-                <input type="text" id="via2" placeholder="Via 2">
-                <input type="text" id="via3" placeholder="Via 3">
+
+                <div class="route-row three">
+                    <input type="text" id="via1" placeholder="Via 1">
+                    <input type="text" id="via2" placeholder="Via 2">
+                    <input type="text" id="via3" placeholder="Via 3">
+                </div>
 
                 <button type="submit">Search connections</button>
+                
             </form>
 
             <p id="user-status"></p>
-            
+
             <button id="logout-button" type="button">Log Out</button>
         </div>
 

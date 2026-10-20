@@ -55,7 +55,7 @@
 #route-search {
     text-align: center;
     padding: 20px;
-    max-width: 600px;
+    max-width: 850px;
     margin: 0 auto 25px;
 }
 
@@ -78,6 +78,32 @@
     font-size: 15px;
     background: #f5faff;
     color: #19262a;
+}
+
+.route-row {
+    display: grid;
+    gap: 10px;
+}
+
+.route-row.two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.route-row.three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.route-row input,
+.route-row select {
+    width: 100%;
+    min-width: 0;
+}
+
+@media (max-width: 600px) {
+    .route-row.two,
+    .route-row.three {
+        grid-template-columns: 1fr;
+    }
 }
 
 #map {
@@ -183,4 +209,78 @@ body {
 hr.dotted {
   border-top: 2px dashed #f5f5f5;
   padding: 0.5em;
+}
+
+.station-field {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+}
+
+.station-field input {
+    width: 100%;
+}
+
+.station-results {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: #f5faff;
+    border: 1px solid #8daaba;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(25, 38, 42, 0.2);
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 1000;
+    text-align: left;
+    padding: 5px;
+}
+
+.station-results:empty {
+    display: none;
+}
+
+.station-option {
+    display: block;
+    width: 100%;
+    padding: 11px 13px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #19262a;
+    font-family: inherit;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.station-option:hover {
+    background: #dce8ef;
+    color: #19262a;
+}
+
+.station-option:focus-visible {
+    outline: 2px solid #397ca4;
+    outline-offset: -2px;
+}
+
+.station-results::-webkit-scrollbar {
+    width: 8px;
+}
+
+.station-results::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.station-results::-webkit-scrollbar-thumb {
+    background: #8daaba;
+    border: 2px solid #f5faff;
+    border-radius: 999px;
+}
+
+.station-results {
+    scrollbar-color: #8daaba transparent;
+    scrollbar-width: thin;
 }
