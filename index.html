@@ -2,6 +2,7 @@
 <html>
     <head>
         <title>osobni vlk :3</title>
+        <meta name="referrer" content="strict-origin-when-cross-origin">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="style.css">
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
@@ -9,17 +10,21 @@
     </head>
     <body>
         <div class="intro">
-            <h1>osobní vlk</h1>
+            <h1>osobni vlk!</h1>
             <img class="wolf" src="https://s3.animalia.bio/animals/photos/full/1x1/4UhsJ4Eaz02SzpkOwDkW.webp" alt="osobní vlk">
             <p>is it a wolf? a train? nope, its a map...</p>
         </div>
 
         <div class="login">
+            <p>To recover your personal <s>wolves</s> trains, please log in with your username.</p>
+            <p>If you don't have an account, enter a username to create one :)</p>
             <form id="login-form">
                 <input type="text" id="username" placeholder="Username" required>
                 <button type="submit">Login</button>
             </form>
         </div>
+
+        <hr class="dotted">
 
         <div class="map">
             <div id="map"></div>

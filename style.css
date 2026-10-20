@@ -3,8 +3,25 @@
     color: #19262a;
 }
 
+* {
+    box-sizing: border-box;
+}
+
 .intro {
     text-align: center;
+    margin: 20px auto 10px;
+}
+
+.intro h1 {
+    font-size: 42px;
+    font-weight: 750;
+    margin: 0 0 15px;
+    letter-spacing: -1.5px;
+}
+
+.intro p {
+    font-size: 18px;
+    margin: 20px 0 0px;
 }
 
 .wolf {
@@ -13,16 +30,68 @@
     border-radius: 25px;
 }
 
-.map {
+#map {
     width: 100%;
-    height: 400px;
-    border: 1px solid #19262a;
+    height: 600px;
+    background: #dce8ef;
+    border-radius: 12px;
+}
+
+.map {
+    width: calc(100% - 40px);
+    margin: 0 auto 30px;
+    margin-bottom: 30px;
+    height: auto;
+    border: 0px solid #19262a;
+    box-shadow: 0 6px 24px rgba(25, 38, 42, 0.12);
+    border-radius: 16px;
 }
 
 .login {
     text-align: center;
     color: #19262a;
+    padding: 1em;
+}
+
+#login-form {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
     padding: 2em;
+}
+
+#login-form button {
+    padding: 12px 24px;
+    background: #19262a;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#login-form button:hover {
+    background: #345866;
+}
+
+#username:focus {
+    border-color: #397ca4;
+    box-shadow: 0 0 0 3px rgba(57, 124, 164, 0.15);
+}
+
+#username  {
+    font-family: inherit;
+    font-size: 15px;
+    background: #f5faff;
+    border: 1px solid #8daaba;
+    color: #19262a;
+    padding: 12px 16px;
+    border-radius: 1px solid #8daaba;
+    border-radius: 10px;
+    outline: none;
+    transition: 0.2s;
 }
 
 #map {
@@ -39,4 +108,9 @@ h1 {
 body {
     margin: 0;
     background-color: #BDD5e7;
+}
+
+hr.dotted {
+  border-top: 2px dashed #f5f5f5;
+  padding: 0.5em;
 }
