@@ -1121,7 +1121,7 @@ function getCarrier(leg) {
     }
 
     // Denmark: DSB
-    if (name === "dsb" || name.startsWith("dsb ") ||
+    if (name === "dsb" || name.startsWith("dsb ") || name.includes("Dänische Staatsbahnen") ||
         name.includes("danske statsbaner")) {
         return { color: "#d91e25", logo: "dsb.dk" };
     }
@@ -1156,6 +1156,32 @@ function getCarrier(leg) {
     // Czech Republic: Leo Express
     if (name.includes("leo express")) {
         return { color: "#292929", logo: "leoexpress.com" };
+    }
+
+    // Prague public transport: metro and PID services
+    if (name.includes("pražská integrovaná doprava") ||
+        name.includes("prazska integrovana doprava") ||
+        name.includes("dopravní podnik hl. m. prahy") ||
+        name.includes("dopravni podnik hl. m. prahy") ||
+        name === "dpp" ||
+        name.startsWith("dpp ") ||
+        name === "pid" ||
+        name.startsWith("pid ") ||
+        name.includes("praha metro") ||
+        name.includes("metro praha")) {
+        if (/\bmetro\s*a\b|\ba\s*metro\b/.test(train)) {
+            return { color: "#009b4d", logo: "dpp.cz" };
+        }
+
+        if (/\bmetro\s*b\b|\bb\s*metro\b/.test(train)) {
+            return { color: "#ffd500", logo: "dpp.cz" };
+        }
+
+        if (/\bmetro\s*c\b|\bc\s*metro\b/.test(train)) {
+            return { color: "#e30613", logo: "dpp.cz" };
+        }
+
+        return { color: "#e30613", logo: "pid.cz" };
     }
 
     // Slovakia: ZSSK
@@ -1230,6 +1256,11 @@ function getCarrier(leg) {
         return { color: "#862452", logo: "crosscountrytrains.co.uk" };
     }
 
+    // Arriva
+    if (name.includes("arriva")) {
+        return { color: "#007f8b", logo: "arriva.com" };
+    }
+
     // END AI
 
     if (name.includes("flix")) {
@@ -1255,7 +1286,7 @@ function getCarrier(leg) {
         return { color: "#812B6D", logo: "sncf.fr" };
     }
 
-    if (name.includes("regiojet") || name.includes("regio jet")) {
+    if (name.includes("regiojet") || name.includes("regio jet") || name.includes("rjuk") || name.includes("rjúk")) {
         return { color: "#ffcc40", logo: "regiojet.com" };
     }
 
@@ -1417,5 +1448,31 @@ function formatTime(time) {
         hour: "2-digit",
         minute: "2-digit",
         timeZone: "Europe/Berlin"
+    });
+}
+
+
+function isFlixTrainConnection(journey) {
+    const legs = journey.legs.filter(
+        leg => leg.mode !== "WALK"
+    );
+
+    return legs.length > 0 && legs.every(leg => {
+        const name = (leg.agencyName || "").toLowerCase();
+        const train = (leg.displayName || "").toLowerCase();
+
+        const railModes = [
+            "RAIL",
+            "LONG_DISTANCE",
+            "HIGHSPEED_RAIL",
+            "NIGHT_RAIL"
+        ];
+
+        return !name.includes("flixbus") && (
+            name.includes("flixtrain") ||
+            train.includes("flixtrain") ||
+            /^flx(?:\b|\d)/.test(train) ||
+            (name.includes("flix") && railModes.includes(leg.mode))
+        );
     });
 }
