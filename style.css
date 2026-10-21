@@ -368,3 +368,64 @@ hr.dotted {
         flex-wrap: wrap;
     }
 }
+
+.delete-connection:hover {
+    background: #a52a35;
+}
+
+.delete-connection {
+    display: block;
+    padding: 10px 16px;
+    background: #19262a;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.custom-train-tooltip .leaflet-tooltip-content {
+    margin: 0;
+}
+
+.custom-train-tooltip {
+    background: white;
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    color: #19262a;
+    padding: 0;
+}
+
+.train-tooltip {
+    padding: 10px 12px;
+    min-width: 220px;
+}
+
+.train-tooltip-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 16px;
+}
+
+.train-tooltip-logo {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.train-tooltip-time {
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.train-tooltip-carrier {
+    font-size: 14px;
+    color: #52616b;
+}

@@ -1,4 +1,5 @@
 const map = L.map('map').setView([51.1657, 10.4515], 6);
+const trainRenderer = L.canvas({ tolerance: 3 });
 
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors',
@@ -60,11 +61,19 @@ async function login(username) {
 
     routeLayers.forEach(layer => map.removeLayer(layer));
 
-    routeLayers = savedRoutes.map(route =>
-        L.polyline(route.points, {
-            color: route.color
-        }).addTo(map)
-    );
+    routeLayers = [];
+
+    savedRoutes.forEach(route => {
+        if (route.legs) {
+            drawConnection(route);
+        } else {
+            routeLayers.push(
+                L.polyline(route.points, {
+                    color: route.color
+                }).addTo(map)
+            );
+        }
+    });
 
     localStorage.setItem("username", currentUser);
     console.log("Logged in as:", currentUser);
@@ -122,6 +131,110 @@ async function saveRoute(points, color) {
     routeLayers.push(
         L.polyline(points, { color }).addTo(map)
     );
+}
+
+async function updateSavedRoutes(routes) {
+    if (!currentUser) {
+        throw new Error("Please login first!");
+    }
+
+    const response = await fetch("/api/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            username: currentUser,
+            routes: routes
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error("Saving failed!");
+    }
+
+    savedRoutes = routes;
+}
+
+function drawConnection(connection) {
+    const lines = connection.legs.map(leg => {
+        const line = L.polyline(
+            L.PolylineUtil.decode(leg.points, leg.precision || 6),
+            {
+                color: leg.color,
+                weight: 5,
+                renderer: trainRenderer
+            }
+        ).addTo(map);
+
+        const date = new Date(leg.startTime).toLocaleDateString(
+            "de-DE",
+            { timeZone: "Europe/Berlin" }
+        );
+        const tooltip = document.createElement("div");
+        tooltip.className = "train-tooltip";
+
+        const carrierInfo = getCarrier({
+            agencyName: leg.carrier,
+            displayName: leg.train
+        });
+
+        tooltip.innerHTML = `
+            <div class="train-tooltip-top">
+                ${
+                    carrierInfo.logo
+                        ? `<img src="https://www.google.com/s2/favicons?sz=64&domain=${carrierInfo.logo}" class="train-tooltip-logo" alt="${leg.carrier}">`
+                        : ""
+                }
+                <strong>${leg.train}</strong>
+            </div>
+            <div class="train-tooltip-time">
+                ${date} · ${formatTime(leg.startTime)} - ${formatTime(leg.endTime)}
+            </div>
+            <div class="train-tooltip-carrier">
+                ${leg.carrier}
+            </div>
+        `;
+
+
+        line.bindTooltip(tooltip, {
+            sticky: true,
+            direction: "top",
+            offset: [0, -8],
+            className: "custom-train-tooltip"
+        });
+
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "Kill Wolves! :p";
+        deleteButton.className = "delete-connection";
+
+        deleteButton.addEventListener("click", async () => {
+            try {
+                const remaining = savedRoutes.filter(
+                    route => route !== connection
+                );
+
+                await updateSavedRoutes(remaining);
+
+                lines.forEach(layer => map.removeLayer(layer));
+
+                routeLayers = routeLayers.filter(
+                    layer => !lines.includes(layer)
+                );
+
+                map.closePopup();
+
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+
+        line.bindPopup(deleteButton);
+
+        return line;
+    });
+
+    routeLayers.push(...lines);
+
+    return lines;
 }
 
 const lastUser = localStorage.getItem("username");
@@ -341,8 +454,41 @@ function showConnections(itineraries) {
             transfers > 0 ? "I took these wolves!" :
             "I took this wolf!";
 
-        tookButton.addEventListener("click", () => {
-            console.log("Selected connection:", journey);
+        tookButton.addEventListener("click", async () => {
+            const connection = {
+                legs: journey.legs
+                    .filter(leg => leg.mode !== "WALK" && leg.legGeometry?.points)
+                    .map(leg => ({
+                        points: leg.legGeometry.points,
+                        precision: leg.legGeometry.precision || 6,
+                        color: getCarrier(leg).color,
+                        train: leg.displayName || leg.mode,
+                        carrier: leg.agencyName || "Unknown carrier",
+                        startTime: leg.startTime,
+                        endTime: leg.endTime
+                    }))
+            };
+
+            if (!connection.legs.length) {
+                alert("No route geometry available!");
+                return;
+            }
+
+            tookButton.disabled = true;
+
+            try {
+                await updateSavedRoutes([...savedRoutes, connection]);
+
+                const lines = drawConnection(connection);
+
+                map.fitBounds(L.featureGroup(lines).getBounds(), {
+                    padding: [30, 30]
+                });
+            } catch (error) {
+                alert(error.message);
+            } finally {
+                tookButton.disabled = false;
+            }
         });
 
         header.appendChild(title);
