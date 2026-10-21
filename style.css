@@ -429,3 +429,21 @@ hr.dotted {
     font-size: 14px;
     color: #52616b;
 }
+
+.custom-train-popup .leaflet-popup-content-wrapper {
+    padding: 0;
+    border-radius: 10px;
+}
+
+.custom-train-popup .leaflet-popup-content {
+    margin: 0;
+}
+
+.custom-train-popup .train-tooltip-top {
+    padding-right: 18px;
+}
+
+.custom-train-popup .delete-connection {
+    width: 100%;
+    margin-top: 12px;
+}
