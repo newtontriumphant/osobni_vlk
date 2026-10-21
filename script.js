@@ -156,8 +156,11 @@ async function updateSavedRoutes(routes) {
 
 function drawConnection(connection) {
     const lines = connection.legs.map(leg => {
+        const points = Array.isArray(leg.points)
+            ? leg.points
+            : L.PolylineUtil.decode(leg.points, leg.precision || 6);
         const line = L.polyline(
-            L.PolylineUtil.decode(leg.points, leg.precision || 6),
+            points,
             {
                 color: getCarrier({
                     agencyName: leg.carrier,
@@ -366,6 +369,15 @@ stationFields.forEach(id => {
     });
 });
 
+const now = new Date();
+const pad = n => String(n).padStart(2, "0");
+
+document.getElementById("travel-date").value =
+    `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+
+document.getElementById("travel-time").value =
+    `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
 document.getElementById("route-form").addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -405,22 +417,90 @@ document.getElementById("route-form").addEventListener("submit", async (e) => {
         );
     }
 
+    const trainType = document.getElementById("train-type").value;
+
+    const modeFilters = {
+        "d-ticket": "REGIONAL_FAST_RAIL,REGIONAL_RAIL,SUBURBAN,SUBWAY,TRAM,BUS,FERRY,FUNICULAR",
+        "long-distance": "HIGHSPEED_RAIL,LONG_DISTANCE,NIGHT_RAIL",
+        "flix": "RAIL,HIGHSPEED_RAIL,LONG_DISTANCE,NIGHT_RAIL"
+    };
+
+    if (modeFilters[trainType]) {
+        params.set("transitModes", modeFilters[trainType]);
+    }
+
+    const searchButton = document.querySelector(
+        '#route-form button[type="submit"]'
+    );
+
+    searchButton.disabled = true;
+
     try {
-        const response = await fetch(
-            "https://api.transitous.org/api/v6/plan?" + params
-        );
+        const endpoint = "https://api.transitous.org/api/v6/plan?";
 
-        if (!response.ok) {
-            throw new Error("HTTP " + response.status);
+        if (trainType === "flix") {
+            const results = [];
+            const seen = new Set();
+            let cursor = null;
+
+            document.getElementById("connections").textContent =
+                "Searching for Flix connections...";
+
+            for (let page = 0; page < 10 && results.length < 10; page++) {
+                if (cursor) {
+                    params.set("pageCursor", cursor);
+                }
+
+                const response = await fetch(endpoint + params);
+                if (!response.ok) {
+                    throw new Error("HTTP " + response.status);
+                }
+
+                const data = await response.json();
+
+                for (const journey of data.itineraries || []) {
+                    if (!isFlixTrainConnection(journey)) continue;
+
+                    const key = journey.id || journey.legs.map(
+                        leg => `${leg.displayName}:${leg.startTime}`
+                    ).join("|");
+
+                    if (seen.has(key)) continue;
+
+                    seen.add(key);
+                    results.push(journey);
+
+                    if (results.length >= 10) break;
+                }
+
+                if (!data.nextPageCursor ||
+                    data.nextPageCursor === cursor) {
+                    break;
+                }
+
+                cursor = data.nextPageCursor;
+            }
+
+            showConnections(results);
+
+        } else {
+            const response = await fetch(endpoint + params);
+
+            if (!response.ok) {
+                throw new Error("HTTP " + response.status);
+            }
+
+            const data = await response.json();
+
+            showConnections(data.itineraries || []);
         }
-
-        const data = await response.json();
-
-        showConnections(data.itineraries || []);
 
     } catch (error) {
         console.error(error);
-        alert("Connection search failed! Make sure you're not looking more than a month in the past!");
+        alert("Connection search failed: " + error.message);
+
+    } finally {
+        searchButton.disabled = false;
     }
 });
 
@@ -569,7 +649,7 @@ function getCarrier(leg) {
     // Dresdner Verkehrsbetriebe: tram, bus,
     // ferry, funicular and suspension railway
     if (name.includes("dresdner verkehrsbetriebe") ||
-        name === "dvb" || name.startsWith("dvb ")) {
+        name === "dvb" || name.startsWith("dvb-") || name.startsWith("dvb ")) {
         return { color: "#efbb00", logo: "dvb.de" };
     }
 
@@ -1229,10 +1309,15 @@ function showConnections(itineraries) {
         tookButton.addEventListener("click", async () => {
             const connection = {
                 legs: journey.legs
-                    .filter(leg => leg.mode !== "WALK" && leg.legGeometry?.points)
+                    .filter(leg => leg.mode !== "WALK")
                     .map(leg => ({
-                        points: leg.legGeometry.points,
-                        precision: leg.legGeometry.precision || 6,
+                        points: leg.legGeometry?.points ||
+                            leg.geometry?.points || [
+                                [leg.from?.lat, leg.from?.lon],
+                                [leg.to?.lat, leg.to?.lon]
+                            ],
+                        precision: leg.legGeometry?.precision ||
+                            leg.geometry?.precision || 6,
                         color: getCarrier(leg).color,
                         train: leg.displayName || leg.mode,
                         carrier: leg.agencyName || "Unknown carrier",
@@ -1241,12 +1326,20 @@ function showConnections(itineraries) {
                     }))
             };
 
-            if (!connection.legs.length) {
-                alert("No route geometry available!");
+            if (connection.legs.some(leg =>
+                !leg.points ||
+                (Array.isArray(leg.points) &&
+                    leg.points.some(point => point.includes(undefined)))
+            )) {
+                alert("No route geometry available for this connection!");
                 return;
             }
 
+            const originalText = tookButton.textContent;
+
             tookButton.disabled = true;
+            tookButton.textContent = "jedu jedu vlkem :)";
+            tookButton.classList.add("took-success");
 
             try {
                 await updateSavedRoutes([...savedRoutes, connection]);
@@ -1257,9 +1350,10 @@ function showConnections(itineraries) {
                     padding: [30, 30]
                 });
             } catch (error) {
-                alert(error.message);
-            } finally {
                 tookButton.disabled = false;
+                tookButton.textContent = originalText;
+                tookButton.classList.remove("took-success");
+                alert(error.message);
             }
         });
 

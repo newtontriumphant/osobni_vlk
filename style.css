@@ -447,3 +447,13 @@ hr.dotted {
     width: 100%;
     margin-top: 12px;
 }
+
+.took-button.took-success,
+.took-button.took-success:disabled,
+.took-button.took-success:hover {
+    background: #248447;
+    border-color: #248447;
+    color: white;
+    opacity: 1;
+    cursor: default;
+}
