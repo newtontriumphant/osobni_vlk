@@ -1,5 +1,7 @@
 # osobní vlk! :3
 
+<img width="641" height="201" alt="Screenshot 2026-10-21 at 7 50 19 PM" src="https://github.com/user-attachments/assets/9a5b9005-cd15-4fec-b379-1064ef4eb954" />
+
 > Preface: In Czechia, slow / passenger trains are referred to as "osobní vlak"! Change just one letter, and "vlak" turns into "vlk" - or wolf! While, sadly, not many people can afford to have personal wolves, anyone can map their train journeys! To make this as easy as possible, I made this!
 
 Hi! Welcome, if you're reading this, chances are you're fond of trains! :yay:
@@ -18,9 +20,13 @@ A large portion of my weekends are spent riding random regional trains in German
 
 I can't wait to drive the same route over and over again 200 times just to make the color a bit deeper... and who knows? Maybe an easter egg might appear ;3
 
+<img width="730" height="275" alt="Screenshot 2026-10-21 at 7 51 41 PM" src="https://github.com/user-attachments/assets/402e9280-653b-4456-9be1-56e323e3a28e" />
+
 ## Usage
 
 To use osobní vlk, simply open up [https://sharp.hackclub.app/osobni-vlk/](https://sharp.hackclub.app/osobni-vlk/) and enter your connection and date! Be aware that this data is only reliable about 1.5 months into the past and about 3-4 months in advance as train data changes! Also, this usually will incorporate delays and last-minute changes, but for some countries such as Denmark, who don't publish this in an open-source format, your train will (falsely) be shown normally :C
+
+<img width="838" height="675" alt="Screenshot 2026-10-21 at 7 50 56 PM" src="https://github.com/user-attachments/assets/04aae8ee-be89-4af9-9b2b-89dac3eeebe7" />
 
 ## Closing Notes
 
